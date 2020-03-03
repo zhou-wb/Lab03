@@ -21,6 +21,8 @@
 #include <vector>			//Standard template library class
 #include <GL/freeglut.h>
 
+#include "../QuadrilateralMesh.h"
+
 
 //in house created libraries
 #include "math/vect3d.h"    //for vector manipulation
@@ -131,6 +133,31 @@ void CreateCurve(vector <Vect3d> *a, int n)
 	}
 }
 
+QuadrilateralMesh CreateCube()
+{
+	std::vector<Vect3d> pos_list;
+	pos_list.push_back(Vect3d(0, 0, 0));
+	pos_list.push_back(Vect3d(1, 0, 0));
+	pos_list.push_back(Vect3d(1, 1, 0));
+	pos_list.push_back(Vect3d(0, 1, 0));
+	pos_list.push_back(Vect3d(0, 1, 1));
+	pos_list.push_back(Vect3d(0, 0, 1));
+	pos_list.push_back(Vect3d(1, 0, 1));
+	pos_list.push_back(Vect3d(1, 1, 1));
+
+	std::vector<int> face0{ 0, 1, 2, 3 };
+	std::vector<int> face1{ 1, 2, 7, 6 };
+	std::vector<int> face2{ 2, 3, 4, 7 };
+	std::vector<int> face3{ 0, 3, 4, 5 };
+	std::vector<int> face4{ 0, 1, 6, 5 };
+	std::vector<int> face5{ 4, 5, 6, 7 };
+	std::vector<std::vector<int> > faces_list{ face0, face1, face2, face3, face4, face5 };
+
+	QuadrilateralMesh cube(pos_list, faces_list);
+
+	return cube;
+}
+
 //Call THIS for a new curve. It clears the old one first
 void InitArray(int n)
 {
@@ -172,32 +199,42 @@ void CoordSyst() {
 
 //this is the actual code for the lab
 void Lab01() {
-	Vect3d a,b,c;
-	Vect3d origin(0, 0, 0);
+//	Vect3d a,b,c;
+//	Vect3d origin(0, 0, 0);
 	Vect3d red(1, 0, 0), green(0, 1, 0), blue(0, 0, 1), almostBlack(0.1f, 0.1f, 0.1f), yellow(1, 1, 0);
+//
+//
+//	CoordSyst();
+//	//draw the curve
+//	if (curveFlag)
+//		for (unsigned int i = 0; i < v.size() - 1; i++) {
+//		DrawLine(v[i], v[i + 1], almostBlack);
+//	}
+//
+//	//draw the points
+//	if (pointsFlag)
+//		for (unsigned int i = 0; i < v.size() - 1; i++) {
+//		DrawPoint(v[i], blue);
+//	}
+//
+////draw the tangents
+//	if (tangentsFlag)
+//	for (unsigned int i = 0; i < v.size() - 1; i++) {
+//		Vect3d tan;
+//		tan = v[i + 1] - v[i]; //too simple - could be better from the point after AND before
+//		tan.Normalize(); 
+//		tan *= 0.2;
+//		DrawLine(v[i], v[i]+tan, red);
+//	}
 
 
-	CoordSyst();
-	//draw the curve
-	if (curveFlag)
-		for (unsigned int i = 0; i < v.size() - 1; i++) {
-		DrawLine(v[i], v[i + 1], almostBlack);
-	}
+	QuadrilateralMesh cube = CreateCube();
 
-	//draw the points
-	if (pointsFlag)
-		for (unsigned int i = 0; i < v.size() - 1; i++) {
-		DrawPoint(v[i], blue);
-	}
-
-//draw the tangents
-	if (tangentsFlag)
-	for (unsigned int i = 0; i < v.size() - 1; i++) {
-		Vect3d tan;
-		tan = v[i + 1] - v[i]; //too simple - could be better from the point after AND before
-		tan.Normalize(); 
-		tan *= 0.2;
-		DrawLine(v[i], v[i]+tan, red);
+	for (int i = 0; i< cube.Edges.size(); i++)
+	{
+		int p_idx0 = cube.Edges[i].points[0];
+		int p_idx1 = cube.Edges[i].points[1];
+		DrawLine(cube.Vertices[p_idx0].pos, cube.Vertices[p_idx1].pos, red);
 	}
 }
 
@@ -319,6 +356,9 @@ void MouseMotion(int x, int y) {
 
 int main(int argc, char **argv)
 { 
+	
+
+
   glutInitDisplayString("stencil>=2 rgb double depth samples");
   glutInit(&argc, argv);
   glutInitWindowSize(wWindow,hWindow);
